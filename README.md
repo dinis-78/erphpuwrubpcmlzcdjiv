@@ -12,7 +12,20 @@ This repository contains the Postgres schema for ProJob Shield (designed for Sup
 
 - Add these GitHub repository secrets: `SUPABASE_URL` (project ref), `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ACCESS_TOKEN`.
 
-To run locally: start Postgres (e.g., `docker run --rm -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:15`) and run `./scripts/test_migrations.sh`
+To run locally with Docker Compose (recommended):
+
+1. Start Postgres and run the migration in a single step:
+
+   ```bash
+   docker compose up --abort-on-container-exit --exit-code-from migrate
+   ```
+
+2. If you prefer to run Postgres separately, you can still run the test script directly after starting the DB:
+
+   ```bash
+   docker run --rm -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:15
+   ./scripts/test_migrations.sh
+   ```
 
 
 -- ==========================================

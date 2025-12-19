@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PSQL_URL="postgresql://postgres:postgres@localhost:5432/postgres"
+# Allow overriding the host or the full URL (useful for docker-compose)
+HOST="${HOST:-localhost}"
+PSQL_URL="${PSQL_URL:-postgresql://postgres:postgres@${HOST}:5432/postgres}"
 
-echo "Waiting for Postgres to be ready..."
-until pg_isready -h localhost -p 5432 -U postgres >/dev/null 2>&1; do
+echo "Waiting for Postgres to be ready on host ${HOST}..."
+until pg_isready -h "$HOST" -p 5432 -U postgres >/dev/null 2>&1; do
   sleep 1
 done
 
