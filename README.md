@@ -33,6 +33,8 @@ Makefile convenience targets:
 - `make up` — start the compose services interactively
 - `make down` — stop the compose services
 
+Note: For local tests we create a minimal `auth` schema and `auth.users` stub in `tests/setup_auth.sql` so the Supabase-specific references (e.g., `auth.users`, `auth.uid()`) in the migration can run locally.
+
 Run a quick test:
 
 ```bash
