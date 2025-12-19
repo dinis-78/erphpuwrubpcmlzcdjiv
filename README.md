@@ -44,6 +44,21 @@ To run locally with Docker Compose (recommended):
    docker compose up --abort-on-container-exit --exit-code-from migrate
    ```
 
+   If you've run migrations before and want a clean run, remove the compose volumes first or use the provided make target:
+
+   ```bash
+   # Remove volumes and run the migration from a clean DB (destructive)
+   make migrate-clean
+   ```
+
+Note: The test script now detects existing `public` schema objects (e.g., `users`, `jobs`, `subscriptions`) and will fail with a helpful message instead of attempting to re-apply non-idempotent DDL.
+
+   Or use the provided Make target for convenience:
+
+   ```bash
+   make migrate-clean
+   ```
+
 2. If you prefer to run Postgres separately, you can still run the test script directly after starting the DB:
 
    ```bash
