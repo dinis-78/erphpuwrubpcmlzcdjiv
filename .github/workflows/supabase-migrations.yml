@@ -37,12 +37,24 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
-      - name: Install Supabase CLI
-        uses: supabase/setup-action@v1
-      - name: Authenticate
+      - name: Install Supabase CLI (via npm)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl ca-certificates
+          curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+          npm install -g supabase
+          supabase --version
+      - name: Ensure Supabase secrets are set
         env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-        run: echo "Authenticated with SUPABASE_ACCESS_TOKEN"
+        run: |
+          if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_SERVICE_ROLE_KEY:-}" ] || [ -z "${SUPABASE_ACCESS_TOKEN:-}" ]; then
+            echo "Required SUPABASE secrets are missing. Add SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY and SUPABASE_ACCESS_TOKEN to repository secrets."
+            exit 1
+          fi
       - name: Push migrations to Supabase
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
