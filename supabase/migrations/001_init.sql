@@ -1,20 +1,3 @@
-# ProJob Shield — SQL schema & Supabase migrations
-
-This repository contains the Postgres schema for ProJob Shield (designed for Supabase with Auth & RLS).
-
-**What's added:**
-
-- `supabase/migrations/001_init.sql` — canonical migration created from this SQL
-- `scripts/test_migrations.sh` — local test runner that applies the migration against a local Postgres service
-- `.github/workflows/supabase-migrations.yml` — GitHub Actions to test migrations on PRs and to deploy them to Supabase on push to `main`
-
-**Before merging to `main` (required):**
-
-- Add these GitHub repository secrets: `SUPABASE_URL` (project ref), `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ACCESS_TOKEN`.
-
-To run locally: start Postgres (e.g., `docker run --rm -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:15`) and run `./scripts/test_migrations.sh`
-
-
 -- ==========================================
 -- ProJob Shield – Full SQL Setup
 -- Includes existing tables, triggers, RLS, and updated subscription tiers
@@ -267,4 +250,3 @@ CREATE TRIGGER check_starter_limit
 BEFORE INSERT ON public.jobs
 FOR EACH ROW
 EXECUTE FUNCTION public.starter_project_limit();
-
