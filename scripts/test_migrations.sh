@@ -16,4 +16,10 @@ psql "$PSQL_URL" -f supabase/migrations/001_init.sql
 echo "Running smoke checks..."
 psql "$PSQL_URL" -c "SELECT to_regclass('public.users') AS users_table, to_regclass('public.jobs') AS jobs_table;"
 
+# Run schema smoke tests if present
+if [ -f tests/schema_smoke.sql ]; then
+  echo "Running schema smoke tests..."
+  psql "$PSQL_URL" -v ON_ERROR_STOP=1 -f tests/schema_smoke.sql
+fi
+
 echo "Done."

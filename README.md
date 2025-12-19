@@ -27,6 +27,18 @@ To run locally with Docker Compose (recommended):
    ./scripts/test_migrations.sh
    ```
 
+Makefile convenience targets:
+
+- `make migrate` — start Postgres and run migrations+tests (recommended)
+- `make up` — start the compose services interactively
+- `make down` — stop the compose services
+
+Run a quick test:
+
+```bash
+make migrate
+```
+
 
 -- ==========================================
 -- ProJob Shield – Full SQL Setup
