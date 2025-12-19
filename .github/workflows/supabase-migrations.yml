@@ -1,0 +1,54 @@
+name: Migrations & Supabase deploy
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  test-migrations:
+    name: Test migrations locally
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Run migrations (test)
+        run: |
+          chmod +x ./scripts/test_migrations.sh
+          ./scripts/test_migrations.sh
+
+  deploy:
+    name: Deploy migrations to Supabase
+    runs-on: ubuntu-latest
+    needs: test-migrations
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Supabase CLI
+        uses: supabase/setup-action@v1
+      - name: Authenticate
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: echo "Authenticated with SUPABASE_ACCESS_TOKEN"
+      - name: Push migrations to Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          # Set remote (best-effort) and push migrations. Requires repository secrets mentioned above.
+          supabase db remote set $SUPABASE_URL --password $SUPABASE_SERVICE_ROLE_KEY || true
+          supabase db push --project-ref $SUPABASE_URL --service-role-key $SUPABASE_SERVICE_ROLE_KEY
