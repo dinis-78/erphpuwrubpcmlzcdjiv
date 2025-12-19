@@ -10,7 +10,31 @@ This repository contains the Postgres schema for ProJob Shield (designed for Sup
 
 **Before merging to `main` (required):**
 
-- Add these GitHub repository secrets: `SUPABASE_URL` (project ref), `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ACCESS_TOKEN`.
+- Add these GitHub repository secrets:
+  - `SUPABASE_PROJECT_REF` or `SUPABASE_URL` — the project ref (short id) shown in the Supabase dashboard
+  - `SUPABASE_SERVICE_ROLE_KEY` — the project's service_role key (from Project Settings → API)
+  - `SUPABASE_ACCESS_TOKEN` — a personal access token / CLI token (from Account Settings → API keys)
+
+**Go-live checklist (quick):**
+
+1. Create a Supabase project (or use an existing one).
+2. Copy the **project ref**, **service_role key**, and **access token**.
+3. Run `scripts/set_supabase_secrets.sh` to set the GitHub repo secrets (requires `gh` CLI and repo write access), or add them manually in the repository settings. For unattended usage you can pass values as env vars, for example:
+
+   ```bash
+   SUPABASE_PROJECT_REF="your-ref" SUPABASE_SERVICE_ROLE_KEY="your-key" SUPABASE_ACCESS_TOKEN="your-token" ./scripts/set_supabase_secrets.sh
+   ```
+4. Verify migrations run locally: `make migrate` or `docker compose up --abort-on-container-exit --exit-code-from migrate`.
+5. Merge to `main` (or run the workflow manually from the Actions tab) — the `Migrations & Supabase deploy` workflow will test and push migrations to Supabase. To trigger it manually from the CLI:
+
+   ```bash
+   # Interactive GitHub CLI trigger (opens prompt to choose workflow and ref):
+   gh workflow run "Migrations & Supabase deploy" --ref main
+   ```
+
+   Or open the repository's Actions tab in the GitHub UI and Run workflow → choose branch `main`.
+
+> Note: The workflow accepts either `SUPABASE_PROJECT_REF` or the legacy `SUPABASE_URL` secret name. After deploy, check the Supabase SQL editor to confirm tables and policies were applied.
 
 To run locally with Docker Compose (recommended):
 
