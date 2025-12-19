@@ -37,13 +37,20 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
-      - name: Install Supabase CLI (via npm)
+      - name: Install Supabase CLI (download binary)
         run: |
           sudo apt-get update
-          sudo apt-get install -y curl ca-certificates
-          curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-          sudo apt-get install -y nodejs
-          npm install -g supabase
+          sudo apt-get install -y curl ca-certificates tar
+          ARCH=$(uname -m)
+          if [ "$ARCH" = "x86_64" ]; then ARCH="x64"; fi
+          if [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; fi
+          OS=$(uname -s)
+          FILE="supabase_${OS}_${ARCH}.tar.gz"
+          URL="https://github.com/supabase/cli/releases/latest/download/${FILE}"
+          echo "Downloading $URL"
+          curl -fsSL "$URL" -o /tmp/supabase.tar.gz
+          tar -xzf /tmp/supabase.tar.gz -C /tmp
+          sudo mv /tmp/supabase /usr/local/bin/
           supabase --version
       - name: Ensure Supabase secrets are set
         env:
